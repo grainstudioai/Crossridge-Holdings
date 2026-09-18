@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, Shield, CheckCircle2, Clock, DollarSign, Home, TrendingUp, Zap, HelpCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, Shield, CheckCircle2, Clock, DollarSign, Home, TrendingUp, Zap, HelpCircle, Phone } from 'lucide-react';
 import { MetroMarket } from '../types';
 
 interface HeroProps {
@@ -179,15 +179,24 @@ export const Hero: React.FC<HeroProps> = ({
               We contract direct with motivated Ohio property owners. Lock in equitable assignment contracts ready for immediate closing or assignment transfer across Ohio.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
               <button
                 onClick={onOpenBuyerModal}
                 id="hero-join-buyer-vip-btn"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-8 py-3.5 rounded-xl text-sm sm:text-base shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-7 py-3.5 rounded-xl text-sm sm:text-base shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02]"
               >
                 <span>Join VIP Cash Buyers Network (Ohio Metros)</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
+
+              <a
+                href="tel:8885822274"
+                id="hero-call-investor-btn"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold px-7 py-3.5 rounded-xl text-sm sm:text-base border border-slate-300 dark:border-slate-700 transition-all hover:scale-[1.02] shadow-sm"
+              >
+                <Phone className="w-4 h-4 text-amber-500 fill-current" />
+                <span>Call (888) 582-2274</span>
+              </a>
             </div>
 
             {/* Investor Key Stats */}

@@ -97,7 +97,7 @@ export const TheProcess: React.FC<TheProcessProps> = ({ onOpenSellerModal }) => 
             className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-black px-8 sm:px-10 py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Sparkles className="w-4 h-4 fill-current" />
-            <span>Get Your Offer</span>
+            <span>Get Your Cash Offer</span>
             <ArrowRight className="w-4 h-4" />
           </button>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5">

@@ -7,7 +7,6 @@ import { TheProcess } from './components/TheProcess';
 import { WhyChooseUs } from './components/WhyChooseUs';
 import { SellerTestimonials } from './components/SellerTestimonials';
 import { LocalSeoDominance } from './components/LocalSeoDominance';
-import { CaseStudies } from './components/CaseStudies';
 import { Footer } from './components/Footer';
 import { SellerLeadModal } from './components/SellerLeadModal';
 import { CashBuyerModal } from './components/CashBuyerModal';
@@ -171,14 +170,6 @@ export default function App() {
           onSelectMetro={setSelectedMetro}
           onOpenSellerModal={handleOpenSellerWithCity}
         />
-
-        {/* Proven Closings & Case Studies */}
-        <CaseStudies
-          onOpenSellerModal={() => {
-            setSellerModalData({});
-            setIsSellerModalOpen(true);
-          }}
-        />
       </main>
 
       {/* Footer */}
@@ -202,7 +193,7 @@ export default function App() {
           className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-slate-950 shadow-md shadow-amber-500/20"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" />
-          <span>Get Cash Offer</span>
+          <span>Get Your Cash Offer</span>
         </button>
       </div>
 

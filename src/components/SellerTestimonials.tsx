@@ -148,12 +148,8 @@ export const SellerTestimonials: React.FC<SellerTestimonialsProps> = ({ onOpenSe
         </div>
       </div>
 
-      {/* Marquee interaction hint & CTA */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
-        <span className="text-xs text-slate-500 dark:text-slate-400">
-          Hover over any review to pause sliding
-        </span>
-        <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+      {/* Marquee CTA */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 text-center">
         <button
           onClick={onOpenSellerModal}
           className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1"

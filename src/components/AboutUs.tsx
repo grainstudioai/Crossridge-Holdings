@@ -78,20 +78,26 @@ export const AboutUs: React.FC<AboutUsProps> = ({ onOpenSellerModal }) => {
                 Our Story & Commitment
               </div>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-snug">
-                Built on Integrity, Transparency, and Realistic Solutions.
+                Built on Integrity, Transparency, and Straightforward Solutions.
               </h3>
             </div>
 
-            {/* Story copy as requested */}
+            {/* Story copy */}
             <div className="space-y-4 text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
               <p>
-                Founded in central Ohio, <strong>Crossridge Holdings LLC</strong> was established with a clear mission: to eliminate the stress, high costs, and months of uncertainty that usually come with traditional real estate sales. After watching Ohio homeowners face costly repair demands, open-house disruptions, and financing contingencies falling through at the last minute, we set out to build a dependable, principal-buyer solution.
-              </p>
-              <p className="p-4 rounded-xl bg-amber-500/5 dark:bg-amber-500/10 border-l-4 border-amber-500 text-slate-800 dark:text-slate-200 font-medium">
-                Our goal is simple: give Columbus homeowners a straightforward alternative when they want to sell without preparing their house for a traditional listing.
+                Crossridge Holdings LLC was founded with a simple idea: selling a property should not have to be complicated.
               </p>
               <p>
-                Whether a home has sat vacant, needs major mechanical repairs, was recently inherited, or is a tired rental with problem tenants, we evaluate every property with total honesty. We work closely with licensed Ohio title companies to ensure clean, lawful transactions that protect sellers at every step.
+                We provide property owners with a straightforward alternative to the traditional home selling process. Whether a property needs significant repairs, has been sitting vacant, was recently inherited, or has become difficult to manage, we take the time to understand the situation and provide a clear path forward.
+              </p>
+              <p>
+                Our approach is simple. We evaluate each property honestly, communicate clearly, and work to make the selling process as smooth as possible. There are no unnecessary preparations or pressure to make a property something it isn't.
+              </p>
+              <p>
+                We also work with licensed title professionals to help ensure each transaction is handled properly from start to finish.
+              </p>
+              <p className="p-4 rounded-xl bg-amber-500/5 dark:bg-amber-500/10 border-l-4 border-amber-500 text-slate-900 dark:text-slate-100 font-bold">
+                Our goal is simple: provide property owners with a transparent, practical way to move forward when selling a property the traditional way isn't the right fit.
               </p>
             </div>
 

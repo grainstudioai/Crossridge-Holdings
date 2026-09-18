@@ -23,33 +23,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 text-slate-100 text-xs py-1.5 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
-            <span className="inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 font-semibold px-2 py-0.5 rounded text-[10px] border border-amber-500/30">
-              OHIO REAL ESTATE ACQUISITIONS
-            </span>
-            <span className="hidden sm:inline">Direct principal cash home buyers across all 88 Ohio counties</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-slate-300">
-            <span className="hidden md:inline-flex items-center gap-1 text-[11px]">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              BBB Accredited Principal Buyer
-            </span>
-            <a
-              href="tel:8885822274"
-              id="header-phone-hotline"
-              className="inline-flex items-center gap-1.5 font-bold text-amber-400 hover:text-amber-300 transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 fill-current" />
-              <span>(888) 582-CASH</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         {/* Brand Logo */}
@@ -138,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Sparkles className="w-3.5 h-3.5 fill-current" />
-            <span>Get Cash Offer</span>
+            <span>Get Your Cash Offer</span>
           </button>
         </div>
       </div>
