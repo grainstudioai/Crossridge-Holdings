@@ -1,0 +1,6 @@
+{
+  "name": "US Real Estate Wholesaling & Valuation Platform",
+  "description": "High-converting US real estate wholesaling platform featuring dynamic market maps, automated ARV & cash offer valuation calculators, motivated seller lead capture, and local SEO dominance.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
