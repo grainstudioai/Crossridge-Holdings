@@ -35,7 +35,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
     companyName: '',
     email: '',
     phone: '',
-    preferredMetros: targetProperty ? [targetProperty.metroId] : ['dfw', 'atlanta'],
+    preferredMetros: targetProperty ? [targetProperty.metroId] : ['columbus', 'cleveland', 'cincinnati'],
     maxPurchasePrice: targetProperty ? targetProperty.contractPrice + 50000 : 350000,
     minDiscountPct: 30,
     strategies: [targetProperty?.strategy || 'Fix & Flip'],
@@ -131,7 +131,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
             <div className="bg-slate-50 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-left mb-6 space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-slate-500">Escrow Partner:</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">Fidelity National Title</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">First American Title Ohio / Chicago Title</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Earnest Deposit Required:</span>
@@ -147,7 +147,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
               onClick={onClose}
               className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
             >
-              Done & Return to Map
+              Close & View Inventory
             </button>
           </div>
         ) : (

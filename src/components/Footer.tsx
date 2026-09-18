@@ -14,19 +14,19 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
                 <Building2 className="w-4 h-4" />
               </div>
               <span className="text-base font-black text-white tracking-tight">
-                US EQUITRADE WHOLESALE
+                CROSSRIDGE HOLDINGS <span className="text-amber-500 text-xs">LLC</span>
               </span>
             </div>
             <p className="text-slate-400 text-xs max-w-sm leading-relaxed">
-              Empowering motivated US property owners to sell as-is for guaranteed cash in 7 days, and providing cash flippers and buy-and-hold investors with exclusive off-market contract assignments.
+              Direct principal real estate acquisitions firm operating across all 88 Ohio counties. Helping Ohio homeowners sell fast as-is for guaranteed cash, and providing qualified cash buyers with prime off-market contracts.
             </p>
             <div className="flex items-center gap-4 text-xs font-semibold text-slate-300 pt-2">
               <a href="tel:8885822274" className="hover:text-amber-400 flex items-center gap-1.5 transition-colors">
                 <Phone className="w-3.5 h-3.5 text-amber-500" /> (888) 582-CASH
               </a>
               <span className="text-slate-600">•</span>
-              <a href="mailto:acquisitions@us-equitrade-realty.com" className="hover:text-amber-400 flex items-center gap-1.5 transition-colors">
-                <Mail className="w-3.5 h-3.5 text-amber-500" /> acquisitions@us-equitrade-realty.com
+              <a href="mailto:acquisitions@crossridgeholdings.com" className="hover:text-amber-400 flex items-center gap-1.5 transition-colors">
+                <Mail className="w-3.5 h-3.5 text-amber-500" /> acquisitions@crossridgeholdings.com
               </a>
             </div>
           </div>
@@ -36,29 +36,45 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
             <h4 className="text-white font-bold uppercase tracking-wider text-[11px] mb-3">
               Tools & Navigation
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-xs">
               <li>
                 <button
-                  onClick={() => onNavigate('hero')}
+                  onClick={() => onNavigate('about-us-section')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  Instant Cash Valuation
+                  About Us (Marcus Vance)
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('deal-map')}
+                  onClick={() => onNavigate('property-types-section')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  Interactive Deal Map
+                  Ohio Property Types
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('valuation-engine')}
+                  onClick={() => onNavigate('the-process-section')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  70% Rule MAO Calculator
+                  The 3-Step Process
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('why-choose-us-section')}
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  Why Choose Us
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('testimonials-section')}
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  Seller Testimonials
                 </button>
               </li>
               <li>
@@ -66,7 +82,7 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
                   onClick={() => onNavigate('local-seo')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  Metro SEO Hub & Statutes
+                  Ohio City Centers & Laws
                 </button>
               </li>
             </ul>
@@ -80,13 +96,13 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
             <div className="space-y-2 text-[11px] leading-relaxed">
               <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Equitable Interest Disclosures</span>
+                <span>ORC § 4735 Statutory Disclosures</span>
               </div>
               <p className="text-slate-400">
-                All earnest deposits held by neutral state-authorized title insurance underwriters.
+                All earnest deposits held by neutral Ohio-authorized title insurance agencies and underwriters.
               </p>
               <div className="pt-2 text-slate-500">
-                Operating in TX, GA, FL, AZ, NC, TN, OH, PA, IN.
+                Operating statewide across all 88 Ohio counties.
               </div>
             </div>
           </div>
@@ -99,7 +115,7 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-4 text-slate-400">
             <div>
-              © {new Date().getFullYear()} US Equitrade Wholesale Network. All rights reserved.
+              © {new Date().getFullYear()} Crossridge Holdings LLC. All rights reserved.
             </div>
             <div className="flex items-center gap-3">
               <span className="hover:text-slate-300 cursor-pointer">Privacy Policy</span>

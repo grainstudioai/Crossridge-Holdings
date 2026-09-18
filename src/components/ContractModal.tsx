@@ -19,12 +19,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
   const contractText = `================================================================================
 STANDARD REAL ESTATE WHOLESALE ASSIGNMENT OF CONTRACT AGREEMENT
-(Equitable Interest Assignment pursuant to Applicable State Law)
+(Equitable Interest Assignment pursuant to Ohio Revised Code § 4735)
 ================================================================================
 
 1. PARTIES & RECITALS:
 This Assignment Agreement ("Agreement") is made and entered into as of this current date, by and between:
-- ASSIGNOR: US Wholesale Realty Exchange Network LLC ("Assignor")
+- ASSIGNOR: Crossridge Holdings LLC ("Assignor")
 - ASSIGNEE: Qualified Cash Buyer / Investor ("Assignee")
 
 RECITALS:
@@ -43,8 +43,8 @@ Assignor hereby assigns, transfers, and conveys to Assignee all of Assignor's ri
 
 3. EARNEST MONEY ESCROW DEPOSIT:
 Assignee shall wire a non-refundable Earnest Money Deposit of $2,500.00 USD into the designated neutral closing title company within one (1) business day of execution:
-- Designated Escrow / Title Company: Fidelity National Title / First American Title Escrow
-- Escrow Officer: Commercial & Residential Wholesale Escrow Division
+- Designated Escrow / Title Company: First American Title Ohio / Chicago Title Escrow
+- Escrow Officer: Ohio Wholesale Acquisitions Escrow Division
 
 4. AS-IS CONDITION & INDEPENDENT INSPECTION:
 Assignee acknowledges and agrees that:
@@ -56,11 +56,11 @@ c) Assignee assumes all obligations, terms, and closing deadlines specified in t
 Closing and title transfer shall take place on or before: ${property.closingDeadline}.
 Title company shall issue a standard Owner's Policy of Title Insurance conveying free, clear, and marketable title subject only to standard easements of record.
 
-6. EQUITABLE DISCLOSURE STATUTE:
-Assignor discloses that it is NOT a licensed real estate broker or agent and does not represent either party in an agency capacity. Assignor is marketing its own contractual rights and equitable interest created under the executed purchase agreement.
+6. OHIO EQUITABLE DISCLOSURE STATUTE:
+Assignor discloses that it is NOT a licensed real estate broker or agent and does not represent either party in an agency capacity. Assignor is marketing its own contractual rights and equitable interest created under the executed purchase agreement in compliance with Ohio Revised Code Chapter 4735.
 
 IN WITNESS WHEREOF, the parties hereto have executed this Assignment Agreement.
-Assignor: US Wholesale Realty Exchange LLC
+Assignor: Crossridge Holdings LLC
 Assignee: _______________________________________ (Seal)
 ================================================================================`;
 

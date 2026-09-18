@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { DynamicMapExplorer } from './components/DynamicMapExplorer';
-import { ValuationCalculator } from './components/ValuationCalculator';
+import { AboutUs } from './components/AboutUs';
+import { PropertyTypes } from './components/PropertyTypes';
+import { TheProcess } from './components/TheProcess';
+import { WhyChooseUs } from './components/WhyChooseUs';
+import { SellerTestimonials } from './components/SellerTestimonials';
 import { LocalSeoDominance } from './components/LocalSeoDominance';
 import { CaseStudies } from './components/CaseStudies';
 import { Footer } from './components/Footer';
 import { SellerLeadModal } from './components/SellerLeadModal';
 import { CashBuyerModal } from './components/CashBuyerModal';
 import { ContractModal } from './components/ContractModal';
-import { METRO_MARKETS, WHOLESALE_PROPERTIES } from './data/wholesaleData';
+import { METRO_MARKETS } from './data/wholesaleData';
 import { MetroMarket, WholesaleProperty, SellerLead } from './types';
-import { Phone, Sparkles, MapPin, Calculator, ShieldCheck } from 'lucide-react';
+import { Phone, Sparkles } from 'lucide-react';
 
 export default function App() {
   // Dark mode state: default to dark for high-tech premium feel, with persistence
@@ -63,7 +66,7 @@ export default function App() {
       address,
       city,
       state,
-      zip: selectedMetro.popularZipCodes[0] || '75216',
+      zip: selectedMetro.popularZipCodes[0] || '43215',
       bedrooms: 3,
       bathrooms: 2,
       sqft: 1650,
@@ -78,19 +81,6 @@ export default function App() {
       city,
       state,
       address: '',
-    });
-    setIsSellerModalOpen(true);
-  };
-
-  // Trigger from calculator lead acceptance
-  const handleCalculatorLeadTrigger = (calcData: any) => {
-    setSellerModalData({
-      address: calcData.address || 'Evaluated Property',
-      city: calcData.city || selectedMetro.name.split('-')[0],
-      state: calcData.state || selectedMetro.state,
-      sqft: calcData.sqft || 1650,
-      condition: calcData.condition || 'fair',
-      estimatedOffer: calcData.estimatedOffer || calcData.targetOffer,
     });
     setIsSellerModalOpen(true);
   };
@@ -127,31 +117,54 @@ export default function App() {
 
       {/* Main Content Sections */}
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* Cover Page / Hero Section */}
         <Hero
           selectedMetro={selectedMetro}
           onStartValuation={handleStartValuationFromHero}
           onOpenBuyerModal={() => handleOpenBuyerForProperty(undefined)}
-          onNavigateToMap={() => handleNavigate('deal-map')}
         />
 
-        {/* Dynamic Deals Map Explorer */}
-        <DynamicMapExplorer
-          properties={WHOLESALE_PROPERTIES}
-          metros={METRO_MARKETS}
-          selectedMetro={selectedMetro}
-          onSelectMetro={setSelectedMetro}
-          onOpenContractModal={handleOpenContractDraft}
-          onOpenBuyerLeadModal={handleOpenBuyerForProperty}
+        {/* About Us (After Cover Page) */}
+        <AboutUs
+          onOpenSellerModal={() => {
+            setSellerModalData({});
+            setIsSellerModalOpen(true);
+          }}
         />
 
-        {/* Automated Valuation & 70% MAO Engine */}
-        <ValuationCalculator
-          selectedMetro={selectedMetro}
-          onLeadTrigger={handleCalculatorLeadTrigger}
+        {/* Types of Property */}
+        <PropertyTypes
+          onOpenSellerModal={() => {
+            setSellerModalData({});
+            setIsSellerModalOpen(true);
+          }}
         />
 
-        {/* Local SEO Dominance Hub */}
+        {/* The Process */}
+        <TheProcess
+          onOpenSellerModal={() => {
+            setSellerModalData({});
+            setIsSellerModalOpen(true);
+          }}
+        />
+
+        {/* Why Choose Us */}
+        <WhyChooseUs
+          onOpenSellerModal={() => {
+            setSellerModalData({});
+            setIsSellerModalOpen(true);
+          }}
+        />
+
+        {/* Testimonials of Sellers (Moving Right to Left) */}
+        <SellerTestimonials
+          onOpenSellerModal={() => {
+            setSellerModalData({});
+            setIsSellerModalOpen(true);
+          }}
+        />
+
+        {/* Ohio City Centers & Statutory Compliance */}
         <LocalSeoDominance
           metros={METRO_MARKETS}
           selectedMetro={selectedMetro}

@@ -1,6 +1,6 @@
 {
-  "name": "US Real Estate Wholesaling & Valuation Platform",
-  "description": "High-converting US real estate wholesaling platform featuring dynamic market maps, automated ARV & cash offer valuation calculators, motivated seller lead capture, and local SEO dominance.",
+  "name": "Crossridge Holdings LLC - Ohio Real Estate Acquisitions",
+  "description": "Premier Ohio real estate wholesale and direct cash home buying platform by Crossridge Holdings LLC. Fast as-is cash offers across Columbus, Cleveland, Cincinnati, Dayton, Akron, and all 88 Ohio counties.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

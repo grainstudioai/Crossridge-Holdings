@@ -8,7 +8,7 @@ interface CaseStudiesProps {
 
 export const CaseStudies: React.FC<CaseStudiesProps> = ({ onOpenSellerModal }) => {
   return (
-    <section className="py-12 sm:py-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <section id="case-studies" className="py-12 sm:py-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-3">
@@ -97,7 +97,7 @@ export const CaseStudies: React.FC<CaseStudiesProps> = ({ onOpenSellerModal }) =
         {/* Title Escrow Partners Logo Strip */}
         <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 text-center">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-4">
-            Nationwide Authorized Escrow & Title Insurance Partners
+            Ohio Authorized Escrow & Title Insurance Partners
           </span>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
             {WHOLESALE_LEGAL_COMPLIANCE.escrowPartners.map((partner, i) => (

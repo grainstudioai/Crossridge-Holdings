@@ -36,9 +36,9 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
 
   const [formData, setFormData] = useState<SellerLead>({
     address: initialData?.address || '',
-    city: initialData?.city || 'Dallas',
-    state: initialData?.state || 'TX',
-    zip: initialData?.zip || '75216',
+    city: initialData?.city || 'Columbus',
+    state: initialData?.state || 'OH',
+    zip: initialData?.zip || '43215',
     bedrooms: initialData?.bedrooms || 3,
     bathrooms: initialData?.bathrooms || 2,
     sqft: initialData?.sqft || 1650,
@@ -92,9 +92,9 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
       });
 
       const data = await res.json();
-      setLeadRefId(data.leadId || 'USW-' + Math.random().toString(36).substring(2, 7).toUpperCase());
+      setLeadRefId(data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 7).toUpperCase());
     } catch (err) {
-      setLeadRefId('USW-' + Math.floor(100000 + Math.random() * 900000));
+      setLeadRefId('CRH-' + Math.floor(100000 + Math.random() * 900000));
     } finally {
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -107,8 +107,8 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
 PRELIMINARY WHOLESALE LETTER OF INTENT (LOI) & CASH OFFER
 =====================================================
 Date: ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}
-Reference ID: ${leadRefId || 'USW-PENDING'}
-Acquisitions Buyer: US Wholesale Realty Exchange Network
+Reference ID: ${leadRefId || 'CRH-PENDING'}
+Acquisitions Buyer: Crossridge Holdings LLC (Ohio Principal Buyer)
 
 PROPERTY DETAILS:
 Street Address: ${formData.address || 'Subject Property'}, ${formData.city}, ${formData.state} ${formData.zip}
@@ -117,15 +117,15 @@ Condition: ${formData.condition.toUpperCase()}
 
 TERMS OF PRELIMINARY CASH ACQUISITION:
 1. Preliminary Purchase Offer Price: $${estimatedCashOffer.toLocaleString()} USD (All Cash)
-2. Earnest Money Deposit: $2,500 deposited into neutral title escrow upon bilateral execution.
+2. Earnest Money Deposit: $2,500 deposited into neutral Ohio title escrow upon bilateral execution.
 3. Closing Timeline: 7 - 14 Business Days (or seller's preferred date).
 4. As-Is Condition: Buyer accepts property in strictly AS-IS condition with zero repairs, zero cleaning, and zero termite/inspection repair demands.
 5. Realtor Commissions: $0.00 (Zero percent).
-6. Closing Costs: Buyer covers standard seller title insurance and transfer escrow fees.
+6. Closing Costs: Buyer covers standard seller title insurance and Ohio transfer conveyance fees.
 7. Post-Occupancy: Up to 14 days free occupancy stay available upon request.
 
 CONFIDENTIAL & EQUITABLE DISCLOSURE:
-This LOI expresses mutual intent to enter into a formal Purchase and Sale Agreement. US Wholesale Realty Exchange acts as principal buyer with equitable interest rights.
+This LOI expresses mutual intent to enter into a formal Purchase and Sale Agreement. Crossridge Holdings LLC acts as principal buyer with equitable interest rights under Ohio Revised Code Chapter 4735.
 
 Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
 =====================================================`;

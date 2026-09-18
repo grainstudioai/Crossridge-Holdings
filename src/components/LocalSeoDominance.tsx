@@ -3,13 +3,12 @@ import {
   MapPin,
   ShieldCheck,
   Building2,
-  FileCheck,
-  TrendingUp,
   Scale,
   ArrowRight,
-  ExternalLink,
   ChevronDown,
-  HelpCircle
+  Sparkles,
+  Clock,
+  DollarSign
 } from 'lucide-react';
 import { MetroMarket } from '../types';
 
@@ -28,26 +27,26 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
 }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const localFaqs = [
+  const ohioFaqs = [
     {
-      q: `Can I legally wholesale real estate in ${selectedMetro.state} without a realtor license?`,
-      a: `Yes. In ${selectedMetro.state} and nationwide, wholesaling real estate via equitable interest assignment is 100% legal. When you sign a valid bilateral Purchase and Sale Agreement with a homeowner, you acquire "equitable interest" in the contract. You are legally marketing and assigning your contractual rights to an end buyer for an assignment fee, in full accordance with statutory disclosure rules (such as Texas Occupations Code § 1101.0045, Florida Real Estate Commission rules, etc.).`,
+      q: `Can I legally sell or wholesale real estate in Ohio without a realtor license?`,
+      a: `Yes. In Ohio, property owners have the unrestricted right to sell their property directly to private buyers. Under Ohio Revised Code (ORC) Chapter 4735, wholesaling real estate via equitable interest assignment is 100% lawful when properly structured. Crossridge Holdings LLC acquires legal and equitable interest through a signed bilateral purchase agreement as a principal buyer, marketing and assigning our contractual rights with full statutory transparency. All escrow is held with licensed Ohio title insurance underwriters.`,
     },
     {
-      q: `How fast can I receive cash for my house in ${selectedMetro.name}?`,
-      a: `Our standard title escrow closing period in ${selectedMetro.name}, ${selectedMetro.state} is between 7 and 14 business days. Because we purchase all-cash with zero lender mortgage underwriting or appraisal contingencies, closing can occur as soon as our neutral title company (e.g. Fidelity National Title or First American Title) completes the municipal lien search.`,
+      q: `How fast can Crossridge Holdings LLC close on my house in Ohio?`,
+      a: `We close in as few as 7 business days across Ohio. Because we purchase with private cash capital, there are zero bank underwriting delays, mortgage contingency clauses, or lender appraisals. As soon as our neutral Ohio title agency (e.g. First American Title Ohio or Chicago Title) conducts the municipal lien and title search, escrow funds are wired directly to you.`,
     },
     {
-      q: `Do I need to pay any real estate commissions, cleaning fees, or repair costs?`,
-      a: `Zero. Traditional MLS listings charge you 5% to 6% in agent commissions plus 2% to 3% in seller transfer closing costs. When selling to US Equitrade Wholesale, you pay $0 in commissions, $0 in closing fees (we cover 100%), and you sell 100% AS-IS. You do not need to clean, paint, or remove unwanted junk.`,
+      q: `Do I need to pay any real estate commissions, cleaning fees, or Ohio transfer taxes?`,
+      a: `Zero. Traditional Ohio MLS listings cost homeowners 5% to 6% in agent commissions plus conveyance fees and transfer closing costs. When working with Crossridge Holdings LLC, you pay $0 in realtor commissions, $0 in fees, and sell 100% AS-IS. You never need to clean, paint, or make repairs.`,
     },
     {
-      q: `What is the difference between a wholesaler and a real estate agent?`,
-      a: `A real estate agent lists your house on the public MLS, schedules dozens of public walk-throughs, requires inspection repairs, and takes 60-90+ days while charging thousands in commissions. A wholesaler contracts to purchase your house directly for cash as a principal, absorbing all market risk and assigning the contract to their vetted cash investor network with guaranteed certainty.`,
+      q: `What major Ohio cities and counties does Crossridge Holdings LLC buy in?`,
+      a: `We purchase houses statewide across all 88 Ohio counties. Our highest-volume submarkets include Franklin County (Columbus), Cuyahoga County (Cleveland), Hamilton County (Cincinnati), Montgomery County (Dayton), Lucas County (Toledo), Summit County (Akron), Stark County (Canton), and Mahoning County (Youngstown).`,
     },
     {
-      q: `How is the cash offer calculated in ${selectedMetro.name}?`,
-      a: `We utilize the standard institutional 70% Wholesaling Formula: Maximum Allowable Offer (MAO) = (After-Repair Value [ARV] × 70%) minus Estimated Contractor Rehab Costs minus our standard assignment spread. This provides the seller instant cash certainty while leaving sufficient margin for the rehab team.`,
+      q: `How is the cash offer calculated for an Ohio property?`,
+      a: `We analyze verified comparable sales from local Ohio county auditor records and MLS sales within the last 90 days. We use the institutional formula: Maximum Allowable Offer (MAO) = (After-Repair Value [ARV] × 70%) minus estimated contractor repair costs and required margins. This gives Ohio homeowners an instant, guaranteed exit without the uncertainty of months on market.`,
     }
   ];
 
@@ -58,145 +57,154 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 mb-3">
             <Scale className="w-3.5 h-3.5" />
-            <span>Local SEO Hub & Wholesale Legality</span>
+            <span>Ohio Market Authority & ORC Compliance</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-            Nationwide Wholesaling Authority & City Centers
+            Statewide Wholesaling Authority & City Centers
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2">
-            Targeting the top high-yield real estate wholesaling metro corridors with compliant equitable assignment structures.
+            Direct cash home buying and equitable assignment acquisitions across Ohio’s premier metropolitan corridors and all 88 counties.
           </p>
         </div>
 
-        {/* Metro Pills Grid */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-          {metros.map((m) => (
-            <button
-              key={m.id}
-              onClick={() => onSelectMetro(m)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                m.id === selectedMetro.id
-                  ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
-                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-              }`}
-            >
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{m.name}, {m.state}</span>
-            </button>
-          ))}
+        {/* Major Cities in Ohio Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+          {metros.map((m) => {
+            const isSelected = m.id === selectedMetro.id;
+            return (
+              <div
+                key={m.id}
+                onClick={() => onSelectMetro(m)}
+                className={`group relative rounded-2xl p-5 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                  isSelected
+                    ? 'bg-white dark:bg-slate-900 border-2 border-amber-500 shadow-lg shadow-amber-500/10 -translate-y-1'
+                    : 'bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-amber-400/50 hover:shadow-md'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {m.name}, OH
+                    </span>
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      {m.activeDealsCount} Active Deals
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors mb-1">
+                    {m.name} Metro
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
+                    {m.tagline}
+                  </p>
+
+                  <div className="space-y-2 py-3 border-y border-slate-100 dark:border-slate-800/80 text-xs">
+                    <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                      <span className="flex items-center gap-1 text-slate-400">
+                        <DollarSign className="w-3 h-3 text-amber-500" />
+                        Median ARV:
+                      </span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        ${m.medianARV.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                      <span className="flex items-center gap-1 text-slate-400">
+                        <Clock className="w-3 h-3 text-emerald-500" />
+                        Avg Close:
+                      </span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                        {m.avgDaysToAssign} - 7 Days
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                      <span className="text-slate-400">Discount spread:</span>
+                      <span className="font-bold text-amber-500">
+                        {m.avgDiscountPct}% below ARV
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Active Zip Codes */}
+                  <div className="mt-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                      Key Cash Zip Codes:
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {m.popularZipCodes.slice(0, 4).map((zip) => (
+                        <span
+                          key={zip}
+                          className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60"
+                        >
+                          {zip}
+                        </span>
+                      ))}
+                      <span className="text-[10px] text-slate-400 self-center">
+                        +more
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenSellerModal(m.name, 'OH');
+                  }}
+                  className="mt-4 w-full inline-flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-800 dark:text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition-colors"
+                >
+                  <span>Get {m.name} Cash Offer</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Active Metro Deep Dive Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left: SEO Headline & Description (7 cols) */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2">
-                <Building2 className="w-4 h-4" />
-                <span>We Buy Distressed Houses Cash In {selectedMetro.name}, {selectedMetro.state}</span>
+        {/* Ohio Statutory Compliance Callout Banner */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 mb-12 shadow-sm">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-3xl">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Ohio Revised Code (ORC) Chapter 4735 Compliant Acquisitions</span>
               </div>
-
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-4">
-                Sell My House Fast in {selectedMetro.name} — Direct Wholesaler Cash Buyer
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                Legally Sound & Transparent Ohio Wholesaling Operations
               </h3>
-
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                Need to sell your house in <strong>{selectedMetro.name}</strong> without paying 6% agent commissions, open houses, or staging costs? We provide institutional-grade wholesale cash acquisitions for probate, foreclosure, inherited properties, and heavy fixer-uppers throughout <strong>{selectedMetro.name} and surrounding county corridors</strong>.
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                Crossridge Holdings LLC contracts as a direct principal with valid equitable interest. All escrow deposits and title insurance are governed by licensed Ohio title agencies adhering strictly to Ohio Department of Insurance regulations.
               </p>
-
-              {/* Local Zip Codes Directory */}
-              <div className="mb-6">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-2">
-                  Active Wholesale Cash Buying Zip Codes in {selectedMetro.shortCode}:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedMetro.popularZipCodes.map((zip) => (
-                    <span
-                      key={zip}
-                      className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
-                    >
-                      {zip}
-                    </span>
-                  ))}
-                  <span className="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400">
-                    + All Greater County Parcels
-                  </span>
-                </div>
-              </div>
-
-              {/* Local Action Button */}
-              <button
-                onClick={() => onOpenSellerModal(selectedMetro.name.split('-')[0], selectedMetro.state)}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-transform hover:scale-[1.01]"
-              >
-                <span>Request {selectedMetro.shortCode} Cash Offer Memorandum</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </div>
 
-            {/* Right: City Market Pulse Metrics (5 cols) */}
-            <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-800/60 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                {selectedMetro.name} Wholesale Economics
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-400 block text-[11px]">Median Submarket ARV</span>
-                  <span className="text-base font-black text-slate-900 dark:text-white">
-                    ${selectedMetro.medianARV.toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-400 block text-[11px]">Average Wholesale Discount</span>
-                  <span className="text-base font-black text-amber-500">
-                    {selectedMetro.avgDiscountPct}% Off ARV
-                  </span>
-                </div>
-
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-400 block text-[11px]">Contract Escrow Velocity</span>
-                  <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
-                    {selectedMetro.avgDaysToAssign} Business Days
-                  </span>
-                </div>
-
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-400 block text-[11px]">Active Wholesale Deals</span>
-                  <span className="text-base font-black text-blue-600 dark:text-blue-400">
-                    {selectedMetro.activeDealsCount} Under Contract
-                  </span>
-                </div>
-              </div>
-
-              {/* State Wholesaling Legal Citation */}
-              <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
-                <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>{selectedMetro.state} Statutory Wholesaling Compliance:</span>
-                </div>
-                <p>
-                  Fully adheres to {selectedMetro.state} equitable interest marketing disclosure statutes. Neutral escrow held with local authorized title underwriters.
-                </p>
-              </div>
+            <div className="shrink-0">
+              <button
+                onClick={() => onOpenSellerModal('Columbus', 'OH')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-transform hover:scale-[1.02]"
+              >
+                <Sparkles className="w-4 h-4 fill-current" />
+                <span>Request Ohio Cash Offer</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Real Estate Wholesaling Rich FAQ (Schema-ready) */}
+        {/* Real Estate Wholesaling Rich FAQ for Ohio */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-6">
             <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              Frequently Asked Questions About US Real Estate Wholesaling
+              Frequently Asked Questions About Selling Your House in Ohio
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Transparent answers for homeowners, flippers, and cash investors.
+              Transparent answers about Ohio cash home buying, as-is sales, and equitable assignment laws.
             </p>
           </div>
 
           <div className="space-y-3">
-            {localFaqs.map((faq, index) => {
+            {ohioFaqs.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
                 <div
