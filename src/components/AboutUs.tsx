@@ -138,11 +138,11 @@ export const AboutUs: React.FC<AboutUsProps> = ({ onOpenSellerModal }) => {
                 <div className="space-y-1">
                   <span className="text-slate-400 block text-[11px]">Official Email</span>
                   <a
-                    href="mailto:acquisitions@crossridgeholdings.com"
+                    href="mailto:info@crossridgeholdingsllc.com"
                     className="font-bold text-slate-900 dark:text-white hover:text-amber-500 flex items-center gap-1.5 transition-colors"
                   >
                     <Mail className="w-4 h-4 text-amber-500" />
-                    acquisitions@crossridgeholdings.com
+                    info@crossridgeholdingsllc.com
                   </a>
                 </div>
               </div>

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import {
   X,
-  Building,
   TrendingUp,
   CheckCircle2,
-  DollarSign,
-  Shield,
   Send,
-  FileCheck,
-  Lock,
-  ArrowRight
+  Mail,
+  Phone,
+  Building,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { WholesaleProperty, MetroMarket, CashBuyerLead } from '../types';
@@ -29,6 +27,8 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
 }) => {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [mailtoLink, setMailtoLink] = useState<string>('');
+  const [leadRefId, setLeadRefId] = useState<string>('');
 
   const [buyerData, setBuyerData] = useState<CashBuyerLead>({
     fullName: '',
@@ -49,7 +49,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -59,8 +59,35 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
           ...buyerData,
         }),
       });
+
+      const data = await res.json();
+      const ref = data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      setLeadRefId(ref);
+
+      if (data.mailtoUrl) {
+        setMailtoLink(data.mailtoUrl);
+      } else {
+        const subject = encodeURIComponent(`[Cash Buyer Inquiry] ${buyerData.fullName} ${buyerData.companyName ? `(${buyerData.companyName})` : ''}`);
+        const body = encodeURIComponent(
+          `Investor: ${buyerData.fullName}\n` +
+          `Company: ${buyerData.companyName || 'N/A'}\n` +
+          `Phone: ${buyerData.phone}\n` +
+          `Email: ${buyerData.email}\n` +
+          `Preferred Metros: ${buyerData.preferredMetros.join(', ')}\n` +
+          `Max Purchase Price: $${buyerData.maxPurchasePrice}\n` +
+          `Target Property: ${targetProperty?.address || 'General List'}`
+        );
+        setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
+      }
     } catch (err) {
-      console.warn('Lead submit fallback');
+      const fallbackRef = 'CRH-' + Math.floor(100000 + Math.random() * 900000);
+      setLeadRefId(fallbackRef);
+      const subject = encodeURIComponent(`[Cash Buyer Inquiry] ${buyerData.fullName}`);
+      const body = encodeURIComponent(
+        `Investor: ${buyerData.fullName} (${buyerData.phone} / ${buyerData.email})\n` +
+        `Metros: ${buyerData.preferredMetros.join(', ')}`
+      );
+      setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
     } finally {
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -100,10 +127,10 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>{targetProperty ? 'Lock In Assignment Contract' : 'VIP Off-Market Buyer Network'}</span>
+              <span>{targetProperty ? 'Property Inquiry & Assignment' : 'Ohio Cash Buyers Network'}</span>
             </div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-              {targetProperty ? targetProperty.address : 'Get 24-Hour Deal Head Start'}
+              {targetProperty ? targetProperty.address : 'Join Exclusive Ohio Buyers Network'}
             </h3>
           </div>
           <button
@@ -119,39 +146,65 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
             <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">
-              {targetProperty ? 'Contract Hold Requested!' : 'Welcome to the VIP Buyers List!'}
+
+            {leadRefId && (
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Reference ID: {leadRefId}
+              </span>
+            )}
+
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1 mb-2">
+              {targetProperty ? 'Property Inquiry Dispatched' : 'Buyer Criteria Received'}
             </h4>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-sm mx-auto mb-6">
-              {targetProperty
-                ? `Our dispositions director has placed a temporary 4-hour soft-hold on ${targetProperty.address} for you. We sent the escrow deposit package to ${buyerData.email}.`
-                : `You are now in our Tier-1 buyer list. You will receive SMS deal alerts with comps, walk-through videos, and lock-in rights before public listing.`}
-            </p>
+
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 max-w-sm mx-auto mb-5 text-left">
+              <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                Email dispatched to <strong>info@crossridgeholdingsllc.com</strong>. Our team will review your buying criteria and match you with off-market wholesale contracts across your preferred Ohio metros.
+              </p>
+            </div>
 
             <div className="bg-slate-50 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-left mb-6 space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">Escrow Partner:</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">First American Title Ohio / Chicago Title</span>
+                <span className="text-slate-500">Contact:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{buyerData.fullName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Earnest Deposit Required:</span>
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400">$2,500 Wire to Escrow</span>
+                <span className="text-slate-500">Recipient Email:</span>
+                <span className="font-bold text-amber-600 dark:text-amber-400">info@crossridgeholdingsllc.com</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Assignment Transfer:</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">Standard Equitable Assignment</span>
+                <span className="text-slate-500">Target Metros:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 capitalize">
+                  {buyerData.preferredMetros.join(', ') || 'Statewide Ohio'}
+                </span>
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
-            >
-              Close & View Inventory
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              {mailtoLink && (
+                <a
+                  href={mailtoLink}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Send Direct Email Copy</span>
+                </a>
+              )}
+              <button
+                onClick={onClose}
+                className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
+              >
+                Close & View Inventory
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+            {/* Direct Email Routing Notice */}
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300">
+              When you submit, your criteria is sent directly to <strong className="text-amber-600 dark:text-amber-400">info@crossridgeholdingsllc.com</strong> for review and property matching.
+            </div>
+
             {targetProperty && (
               <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between">
                 <div>
@@ -231,7 +284,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
             {/* Target Metros Selector */}
             <div>
               <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                Target US Metros (Select all that apply)
+                Target Ohio Metros (Select all that apply)
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {metros.map((m) => {
@@ -264,7 +317,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 className="mt-0.5 accent-amber-500 rounded"
               />
               <label htmlFor="pof-ready" className="text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
-                <strong>Proof of Funds Ready:</strong> I have liquid cash or pre-approved hard money ready to close in 7 - 14 days without mortgage contingencies.
+                <strong>Proof of Funds Ready:</strong> I have liquid cash or pre-approved private capital ready to close in 7 - 14 days without mortgage contingencies.
               </label>
             </div>
 
@@ -274,11 +327,11 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
               className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-500/20 transition-all text-xs sm:text-sm"
             >
               {isSubmitting ? (
-                <span>Submitting Buyer Request...</span>
+                <span>Submitting to info@crossridgeholdingsllc.com...</span>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>{targetProperty ? 'Submit Contract Hold & Request Title Packet' : 'Join VIP Buyer Network'}</span>
+                  <span>{targetProperty ? 'Submit Property Inquiry' : 'Join VIP Cash Buyers Network'}</span>
                 </>
               )}
             </button>

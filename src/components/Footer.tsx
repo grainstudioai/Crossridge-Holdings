@@ -25,8 +25,8 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
                 <Phone className="w-3.5 h-3.5 text-amber-500" /> (888) 582-CASH
               </a>
               <span className="text-slate-600">•</span>
-              <a href="mailto:acquisitions@crossridgeholdings.com" className="hover:text-amber-400 flex items-center gap-1.5 transition-colors">
-                <Mail className="w-3.5 h-3.5 text-amber-500" /> acquisitions@crossridgeholdings.com
+              <a href="mailto:info@crossridgeholdingsllc.com" className="hover:text-amber-400 flex items-center gap-1.5 transition-colors">
+                <Mail className="w-3.5 h-3.5 text-amber-500" /> info@crossridgeholdingsllc.com
               </a>
             </div>
           </div>

@@ -46,7 +46,7 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
     },
     {
       q: `How is the cash offer calculated for an Ohio property?`,
-      a: `We analyze verified comparable sales from local Ohio county auditor records and MLS sales within the last 90 days. We use the institutional formula: Maximum Allowable Offer (MAO) = (After-Repair Value [ARV] × 70%) minus estimated contractor repair costs and required margins. This gives Ohio homeowners an instant, guaranteed exit without the uncertainty of months on market.`,
+      a: `We review the property, recent comparable sales, and its condition to determine whether it may fit criteria from investors in our network. This straightforward evaluation ensures clear communication, realistic expectations, and a transparent cash offer without guesswork.`,
     }
   ];
 
@@ -156,7 +156,7 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
                   }}
                   className="mt-4 w-full inline-flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-800 dark:text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition-colors"
                 >
-                  <span>Get {m.name} Cash Offer</span>
+                  <span>Get Your Cash Offer</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -186,7 +186,7 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-transform hover:scale-[1.02]"
               >
                 <Sparkles className="w-4 h-4 fill-current" />
-                <span>Request Ohio Cash Offer</span>
+                <span>Get Your Cash Offer</span>
               </button>
             </div>
           </div>

@@ -95,7 +95,7 @@ export const Hero: React.FC<HeroProps> = ({
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
-              Skip traditional 6% realtor commissions, months of open houses, and expensive repairs. Crossridge Holdings LLC provides transparent property valuations and fast cash offers across all 88 Ohio counties.
+              Skip traditional 6% realtor commissions, months of open houses, and expensive repairs. We review the property, recent comparable sales, and its condition to determine investor fit and provide a straightforward cash offer across Ohio.
             </p>
 
             {/* High-Converting Address Search Bar */}
@@ -119,7 +119,7 @@ export const Hero: React.FC<HeroProps> = ({
                   id="hero-get-offer-btn"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-6 py-3.5 rounded-xl text-sm sm:text-base shadow-lg shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <span>Instant Valuation & Offer</span>
+                  <span>Get Your Cash Offer</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>

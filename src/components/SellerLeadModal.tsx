@@ -11,9 +11,9 @@ import {
   Mail,
   User,
   Clock,
-  Download,
-  AlertTriangle,
-  Lock
+  Send,
+  Lock,
+  FileText
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SellerLead } from '../types';
@@ -21,7 +21,7 @@ import { SellerLead } from '../types';
 interface SellerLeadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: Partial<SellerLead> & { estimatedOffer?: number };
+  initialData?: Partial<SellerLead>;
 }
 
 export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
@@ -33,6 +33,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [leadRefId, setLeadRefId] = useState<string>('');
+  const [mailtoLink, setMailtoLink] = useState<string>('');
 
   const [formData, setFormData] = useState<SellerLead>({
     address: initialData?.address || '',
@@ -44,7 +45,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
     sqft: initialData?.sqft || 1650,
     propertyType: initialData?.propertyType || 'Single Family',
     condition: initialData?.condition || 'fair',
-    reasonForSelling: initialData?.reasonForSelling || 'Needs fast cash closing',
+    reasonForSelling: initialData?.reasonForSelling || 'Needs straightforward sale',
     timeline: initialData?.timeline || '7_days',
     fullName: initialData?.fullName || '',
     phone: initialData?.phone || '',
@@ -54,13 +55,11 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
 
   if (!isOpen) return null;
 
-  const estimatedCashOffer = initialData?.estimatedOffer || Math.round(formData.sqft * 195 * 0.7 - 35000 - 15000);
-
   const triggerCelebration = () => {
     try {
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: 70,
+        spread: 60,
         origin: { y: 0.6 },
         colors: ['#f59e0b', '#10b981', '#3b82f6'],
       });
@@ -85,58 +84,47 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          leadType: 'MOTIVATED_SELLER',
+          leadType: 'SELLER_PROPERTY_SUBMISSION',
           ...formData,
-          targetOffer: estimatedCashOffer,
         }),
       });
 
       const data = await res.json();
-      setLeadRefId(data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 7).toUpperCase());
+      const ref = data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      setLeadRefId(ref);
+
+      if (data.mailtoUrl) {
+        setMailtoLink(data.mailtoUrl);
+      } else {
+        const subject = encodeURIComponent(`[Property Review] ${formData.address}, ${formData.city}, ${formData.state}`);
+        const body = encodeURIComponent(
+          `Property Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}\n` +
+          `Beds/Baths: ${formData.bedrooms}/${formData.bathrooms}\n` +
+          `SqFt: ${formData.sqft}\n` +
+          `Condition: ${formData.condition}\n` +
+          `Timeline: ${formData.timeline}\n` +
+          `Notes: ${formData.notes || 'None'}\n\n` +
+          `Seller Contact:\n` +
+          `Name: ${formData.fullName}\n` +
+          `Phone: ${formData.phone}\n` +
+          `Email: ${formData.email}`
+        );
+        setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
+      }
     } catch (err) {
-      setLeadRefId('CRH-' + Math.floor(100000 + Math.random() * 900000));
+      const fallbackRef = 'CRH-' + Math.floor(100000 + Math.random() * 900000);
+      setLeadRefId(fallbackRef);
+      const subject = encodeURIComponent(`[Property Review] ${formData.address}, ${formData.city}, ${formData.state}`);
+      const body = encodeURIComponent(
+        `Property Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}\n` +
+        `Seller: ${formData.fullName} (${formData.phone} / ${formData.email})`
+      );
+      setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
     } finally {
       setIsSubmitting(false);
       setIsSuccess(true);
       triggerCelebration();
     }
-  };
-
-  const downloadLOI = () => {
-    const text = `=====================================================
-PRELIMINARY WHOLESALE LETTER OF INTENT (LOI) & CASH OFFER
-=====================================================
-Date: ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}
-Reference ID: ${leadRefId || 'CRH-PENDING'}
-Acquisitions Buyer: Crossridge Holdings LLC (Ohio Principal Buyer)
-
-PROPERTY DETAILS:
-Street Address: ${formData.address || 'Subject Property'}, ${formData.city}, ${formData.state} ${formData.zip}
-Property Type: ${formData.propertyType} (${formData.bedrooms} Bed / ${formData.bathrooms} Bath, ~${formData.sqft} sqft)
-Condition: ${formData.condition.toUpperCase()}
-
-TERMS OF PRELIMINARY CASH ACQUISITION:
-1. Preliminary Purchase Offer Price: $${estimatedCashOffer.toLocaleString()} USD (All Cash)
-2. Earnest Money Deposit: $2,500 deposited into neutral Ohio title escrow upon bilateral execution.
-3. Closing Timeline: 7 - 14 Business Days (or seller's preferred date).
-4. As-Is Condition: Buyer accepts property in strictly AS-IS condition with zero repairs, zero cleaning, and zero termite/inspection repair demands.
-5. Realtor Commissions: $0.00 (Zero percent).
-6. Closing Costs: Buyer covers standard seller title insurance and Ohio transfer conveyance fees.
-7. Post-Occupancy: Up to 14 days free occupancy stay available upon request.
-
-CONFIDENTIAL & EQUITABLE DISCLOSURE:
-This LOI expresses mutual intent to enter into a formal Purchase and Sale Agreement. Crossridge Holdings LLC acts as principal buyer with equitable interest rights under Ohio Revised Code Chapter 4735.
-
-Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
-=====================================================`;
-
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Cash_Offer_LOI_${formData.city}_${formData.state}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -150,10 +138,10 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Official Direct Cash Offer Wizard</span>
+              <span>Crossridge Holdings Property Review</span>
             </div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-              {isSuccess ? 'Offer Locked & Confirmed!' : 'Get Your 7-Day Cash Contract'}
+              {isSuccess ? 'Property Details Received' : 'Submit Your Property for Review'}
             </h3>
           </div>
           <button
@@ -175,36 +163,53 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
               Reference ID: {leadRefId}
             </span>
             <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 mb-2">
-              Preliminary Cash Offer: ${estimatedCashOffer.toLocaleString()}
+              Property Submitted for Review
             </h4>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
-              An acquisitions specialist in <strong>{formData.city}, {formData.state}</strong> has been assigned to your address ({formData.address}). We will call/text you at <strong>{formData.phone}</strong> within 15 minutes to review closing paperwork.
-            </p>
 
-            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-left text-xs mb-6 space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Zero Realtor Commissions Guaranteed (Save ~$18,000+)</span>
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 max-w-md mx-auto mb-5 text-left">
+              <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                Email dispatched to <strong>info@crossridgeholdingsllc.com</strong>. We review the property, recent comparable sales, and its condition to determine whether it may fit criteria from investors in our network.
+              </p>
+            </div>
+
+            {/* Submission Summary Card */}
+            <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-left text-xs mb-6 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-slate-500 dark:text-slate-400">Property:</span>
+                <span className="font-bold text-slate-900 dark:text-white text-right">
+                  {formData.address || 'Address provided'}, {formData.city}, {formData.state} {formData.zip}
+                </span>
               </div>
-              <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
-                <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Target Escrow Closing: 7 - 14 Days (Title Escrow Protected)</span>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400">Specs:</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-200">
+                  {formData.bedrooms} Bed / {formData.bathrooms} Bath • ~{formData.sqft} sqft
+                </span>
               </div>
-              <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
-                <Home className="w-4 h-4 text-blue-500 shrink-0" />
-                <span>100% As-Is Condition: Take what you want, leave what you don't.</span>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400">Contact:</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-200">
+                  {formData.fullName} ({formData.phone})
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400">Recipient:</span>
+                <span className="font-bold text-amber-600 dark:text-amber-400">
+                  info@crossridgeholdingsllc.com
+                </span>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={downloadLOI}
-                id="download-loi-btn"
-                className="inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition-all"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Printable Cash LOI Draft</span>
-              </button>
+              {mailtoLink && (
+                <a
+                  href={mailtoLink}
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition-all"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send Direct Email Copy</span>
+                </a>
+              )}
               <button
                 onClick={onClose}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
@@ -216,12 +221,19 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
         ) : (
           /* Multi-Step Form */
           <form onSubmit={handleNext}>
+            {/* Real Review Philosophy Subhead */}
+            <div className="px-6 pt-3 pb-1">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                <strong className="text-slate-900 dark:text-white">We Review the Property:</strong> We review the property, recent comparable sales, and its condition to determine whether it may fit criteria from investors in our network. Submissions are delivered directly to <strong className="text-amber-600 dark:text-amber-400">info@crossridgeholdingsllc.com</strong>.
+              </div>
+            </div>
+
             {/* Progress Stepper */}
-            <div className="px-6 pt-4 pb-2">
+            <div className="px-6 pt-3 pb-2">
               <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1.5">
                 <span className={step >= 1 ? 'text-amber-500' : ''}>1. Property Address</span>
-                <span className={step >= 2 ? 'text-amber-500' : ''}>2. Condition & Motivation</span>
-                <span className={step >= 3 ? 'text-amber-500' : ''}>3. Payout Contact</span>
+                <span className={step >= 2 ? 'text-amber-500' : ''}>2. Condition & Timeline</span>
+                <span className={step >= 3 ? 'text-amber-500' : ''}>3. Contact Details</span>
               </div>
               <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                 <div
@@ -349,17 +361,17 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
                       onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
                       className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
                     >
-                      <option value="excellent">Move-in Ready (Minor cosmetics)</option>
-                      <option value="fair">Dated Interior (Needs modern kitchen/baths)</option>
-                      <option value="poor">Major Fixer (Roof, HVAC, or plumbing issues)</option>
-                      <option value="distressed">Full Gut Renovation / Vacant / Hoarder</option>
-                      <option value="fire_water_damage">Fire / Water / Foundation Damage</option>
+                      <option value="excellent">Move-In Ready (Already updated or minor cosmetics)</option>
+                      <option value="fair">Older or Partially Renovated (Dated interior)</option>
+                      <option value="poor">Needs Major Repairs (Roof, HVAC, plumbing, structural)</option>
+                      <option value="distressed">Vacant Property / Full Gut Renovation</option>
+                      <option value="fire_water_damage">Inherited or Rental Property</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Preferred Closing Timeline
+                      Preferred Timeline
                     </label>
                     <select
                       value={formData.timeline}
@@ -369,43 +381,41 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
                       <option value="7_days">As fast as possible (7 Days)</option>
                       <option value="14_days">Within 2 Weeks (14 Days)</option>
                       <option value="30_days">Within 30 Days</option>
-                      <option value="flexible">I am flexible / Need post-occupancy stay</option>
+                      <option value="flexible">Flexible / Need time to relocate</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Any liens, mortgage balance, or details?
+                      Any additional notes or details about the house?
                     </label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="e.g. Inherited property, taxes are current, vacant for 6 months..."
+                      placeholder="e.g. Vacant for a few months, inherited from family, rental with tenants, needs new roof..."
                       className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none resize-none"
                     />
                   </div>
                 </div>
               )}
 
-              {/* STEP 3: Contact & Instant Offer Delivery */}
+              {/* STEP 3: Contact & Submission */}
               {step === 3 && (
                 <div className="space-y-3 animate-in fade-in">
-                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-center">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
-                      Calculated Cash Offer Ready:
-                    </span>
-                    <div className="text-2xl font-black text-slate-950 dark:text-white">
-                      ${estimatedCashOffer.toLocaleString()}
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3.5 text-left">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Direct Team Property Review</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                      Zero Fees • We cover 100% standard closing costs
-                    </span>
+                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                      We will review your property, recent comparable sales, and its condition to determine investor criteria fit. Your submission goes directly to <strong>info@crossridgeholdingsllc.com</strong>.
+                    </p>
                   </div>
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Full Legal Name (as on Deed or Title)
+                      Your Full Name
                     </label>
                     <div className="relative">
                       <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -422,7 +432,7 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Mobile Phone (for Offer SMS & Call)
+                      Phone Number
                     </label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -439,7 +449,7 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Email Address (for Written Agreement copy)
+                      Email Address
                     </label>
                     <div className="relative">
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -456,7 +466,7 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
 
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-1">
                     <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>100% Confidential. No spam. No MLS listings. No pressure.</span>
+                    <span>100% Confidential. No obligations. Dispatched directly to our acquisitions team.</span>
                   </div>
                 </div>
               )}
@@ -487,11 +497,11 @@ Seller Contact: ${formData.fullName} | ${formData.phone} | ${formData.email}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 ) : isSubmitting ? (
-                  <span>Generating Official Cash Contract...</span>
+                  <span>Submitting Details to Team...</span>
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Lock In My Cash Offer</span>
+                    <span>Get Your Cash Offer</span>
                   </>
                 )}
               </button>
