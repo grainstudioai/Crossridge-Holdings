@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
@@ -9,7 +10,35 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// Serve public directory
+const publicDir = path.join(process.cwd(), "public");
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+app.use(express.static(publicDir));
+
+// Image upload endpoint
+app.post("/api/upload-image", (req, res) => {
+  try {
+    const { filename, base64Data } = req.body;
+    if (!filename || !base64Data) {
+      return res.status(400).json({ error: "Missing filename or base64Data" });
+    }
+    const cleanBase64 = base64Data.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(cleanBase64, "base64");
+    const safeFilename = path.basename(filename);
+    const targetPath = path.join(publicDir, safeFilename);
+    fs.writeFileSync(targetPath, buffer);
+    console.log(`Successfully saved uploaded image to ${targetPath} (${buffer.length} bytes)`);
+    return res.json({ success: true, filename: safeFilename, url: `/${safeFilename}` });
+  } catch (err: any) {
+    console.error("Upload error:", err);
+    return res.status(500).json({ error: "Failed to upload image", details: err?.message });
+  }
+});
 
 // Lazy-initialized Gemini client
 let geminiClient: GoogleGenAI | null = null;

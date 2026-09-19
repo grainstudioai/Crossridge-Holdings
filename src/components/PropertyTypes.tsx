@@ -12,6 +12,7 @@ interface PropertyCategory {
   tag: string;
   icon: React.ComponentType<{ className?: string }>;
   image: string;
+  fallbackImage?: string;
 }
 
 export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal }) => {
@@ -33,8 +34,9 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
         'If a property has been sitting empty, tell us about its condition and situation.',
       tag: 'Unoccupied / Zero Income',
       icon: Key,
-      image:
-        'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
+      image: '/Vacant_home_interior_2K_20260919133218.jpeg',
+      fallbackImage:
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'inherited',
@@ -53,8 +55,9 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
         "If you're considering selling a rental property, tell us about it and its current situation.",
       tag: 'Tenant-Occupied / Portfolios',
       icon: Building,
-      image:
-        'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
+      image: '/vacant_house_but_fully_maintained_2K_20260919133230.jpeg',
+      fallbackImage:
+        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'partially-renovated',
@@ -99,6 +102,7 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {propertyCategories.map((item) => {
             const Icon = item.icon;
+
             return (
               <div
                 key={item.id}
@@ -113,11 +117,19 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src.endsWith('.jpeg')) {
+                        target.src = target.src.replace(/\.jpeg$/, '.jpg');
+                      } else if (item.fallbackImage && target.src !== item.fallbackImage) {
+                        target.src = item.fallbackImage;
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20" />
 
                   {/* Badge */}
-                  <div className="absolute top-3 left-3">
+                  <div className="absolute top-3 left-3 z-10">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-900/80 backdrop-blur-md text-amber-400 border border-slate-700/60 shadow-sm">
                       <Icon className="w-3 h-3" />
                       {item.tag}
