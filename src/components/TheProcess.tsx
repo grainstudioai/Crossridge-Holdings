@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ArrowRight, ClipboardEdit, SearchCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ClipboardEdit, SearchCheck, CheckCircle2 } from 'lucide-react';
 
 interface TheProcessProps {
   onOpenSellerModal: () => void;
@@ -38,7 +38,7 @@ export const TheProcess: React.FC<TheProcessProps> = ({ onOpenSellerModal }) => 
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
+            <ClipboardEdit className="w-3.5 h-3.5" />
             <span>The Process</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -94,14 +94,13 @@ export const TheProcess: React.FC<TheProcessProps> = ({ onOpenSellerModal }) => 
           <button
             onClick={onOpenSellerModal}
             id="the-process-get-offer-btn"
-            className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-black px-8 sm:px-10 py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-black px-8 sm:px-10 py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Sparkles className="w-4 h-4 fill-current" />
             <span>Get Your Cash Offer</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5">
-            Takes 2 minutes • 100% confidential • No fees or obligations
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2.5 font-medium">
+            No Pressure. No Obligations. No Commission
           </p>
         </div>
       </div>

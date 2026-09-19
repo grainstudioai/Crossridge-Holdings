@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Building2, Moon, Sun, ShieldCheck, Sparkles } from 'lucide-react';
+import { Phone, Building2, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { MetroMarket } from '../types';
 
 interface NavbarProps {
@@ -105,9 +105,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onOpenSellerModal}
             id="nav-get-cash-offer-btn"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Sparkles className="w-3.5 h-3.5 fill-current" />
             <span>Get Your Cash Offer</span>
           </button>
         </div>

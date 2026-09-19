@@ -6,7 +6,6 @@ import {
   Scale,
   ArrowRight,
   ChevronDown,
-  Sparkles,
   Clock,
   DollarSign
 } from 'lucide-react';
@@ -185,8 +184,8 @@ export const LocalSeoDominance: React.FC<LocalSeoDominanceProps> = ({
                 onClick={() => onOpenSellerModal('Columbus', 'OH')}
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-transform hover:scale-[1.02]"
               >
-                <Sparkles className="w-4 h-4 fill-current" />
                 <span>Get Your Cash Offer</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>

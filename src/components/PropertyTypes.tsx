@@ -24,7 +24,7 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
       tag: 'Distressed / Heavy Rehab',
       icon: Hammer,
       image:
-        'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'vacant',
@@ -34,7 +34,7 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
       tag: 'Unoccupied / Zero Income',
       icon: Key,
       image:
-        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'inherited',
@@ -54,7 +54,7 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
       tag: 'Tenant-Occupied / Portfolios',
       icon: Building,
       image:
-        'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'partially-renovated',
@@ -112,6 +112,7 @@ export const PropertyTypes: React.FC<PropertyTypesProps> = ({ onOpenSellerModal 
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
+                    referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20" />
 
