@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   X,
   CheckCircle2,
@@ -18,6 +18,7 @@ import {
 import confetti from 'canvas-confetti';
 import { SellerLead } from '../types';
 import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
+import { HCaptchaWidget, HCaptchaWidgetHandle } from './HCaptchaWidget';
 
 interface SellerLeadModalProps {
   isOpen: boolean;
@@ -36,6 +37,10 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
   const [submitError, setSubmitError] = useState<boolean>(false);
   const [leadRefId, setLeadRefId] = useState<string>('');
   const [mailtoLink, setMailtoLink] = useState<string>('');
+  const [honeypot, setHoneypot] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const captchaRef = useRef<HCaptchaWidgetHandle>(null);
+  const captchaRequired = Boolean(import.meta.env.VITE_HCAPTCHA_SITE_KEY);
 
   const [formData, setFormData] = useState<SellerLead>({
     address: initialData?.address || '',
@@ -97,31 +102,40 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
       `Phone: ${formData.phone}\n` +
       `Email: ${formData.email}`;
 
-    const { ok, refId } = await submitLead(subject, {
-      lead_type: 'SELLER_PROPERTY_SUBMISSION',
-      full_name: formData.fullName,
-      phone: formData.phone,
-      email: formData.email,
-      property_address: formData.address,
-      city: formData.city,
-      state: formData.state,
-      zip: formData.zip,
-      bedrooms: formData.bedrooms,
-      bathrooms: formData.bathrooms,
-      sqft: formData.sqft,
-      property_type: formData.propertyType,
-      condition: formData.condition,
-      timeline: formData.timeline,
-      notes: formData.notes,
-      message: body,
-    });
+    const { ok, refId } = await submitLead(
+      subject,
+      {
+        lead_type: 'SELLER_PROPERTY_SUBMISSION',
+        full_name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        property_address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zip,
+        bedrooms: formData.bedrooms,
+        bathrooms: formData.bathrooms,
+        sqft: formData.sqft,
+        property_type: formData.propertyType,
+        condition: formData.condition,
+        timeline: formData.timeline,
+        notes: formData.notes,
+        message: body,
+      },
+      { honeypot, captchaToken }
+    );
 
     setLeadRefId(refId);
     setMailtoLink(buildMailtoLink(subject, body));
     setIsSubmitting(false);
     setIsSuccess(ok);
     setSubmitError(!ok);
-    if (ok) triggerCelebration();
+    if (ok) {
+      triggerCelebration();
+    } else {
+      captchaRef.current?.reset();
+      setCaptchaToken('');
+    }
   };
 
   return (
@@ -247,6 +261,18 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
         ) : (
           /* Multi-Step Form */
           <form onSubmit={handleNext}>
+            {/* Honeypot: hidden from real visitors, bots that auto-fill every field trip it */}
+            <input
+              type="text"
+              name="company_website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] w-px h-px opacity-0"
+            />
+
             {/* Real Review Philosophy Subhead */}
             <div className="px-6 pt-3 pb-1">
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -282,6 +308,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="text"
                         required
+                        maxLength={120}
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         placeholder="e.g. 4218 Fordham Rd"
@@ -298,6 +325,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="text"
                         required
+                        maxLength={60}
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
@@ -323,6 +351,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="text"
                         required
+                        maxLength={12}
                         value={formData.zip}
                         onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
@@ -417,6 +446,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                     </label>
                     <textarea
                       rows={3}
+                      maxLength={1000}
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="e.g. Vacant for a few months, inherited from family, rental with tenants, needs new roof..."
@@ -448,6 +478,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="text"
                         required
+                        maxLength={100}
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         placeholder="John Smith"
@@ -465,6 +496,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="tel"
                         required
+                        maxLength={30}
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="(555) 000-0000"
@@ -482,6 +514,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                       <input
                         type="email"
                         required
+                        maxLength={150}
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="john@example.com"
@@ -494,6 +527,8 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                     <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                     <span>100% Confidential. No obligations. Dispatched directly to our acquisitions team.</span>
                   </div>
+
+                  <HCaptchaWidget ref={captchaRef} onVerify={setCaptchaToken} onExpire={() => setCaptchaToken('')} />
                 </div>
               )}
             </div>
@@ -514,8 +549,8 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01]"
+                disabled={isSubmitting || (step === 3 && captchaRequired && !captchaToken)}
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {step < 3 ? (
                   <>

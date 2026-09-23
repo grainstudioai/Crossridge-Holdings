@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   X,
   TrendingUp,
@@ -12,6 +12,7 @@ import {
 import confetti from 'canvas-confetti';
 import { WholesaleProperty, MetroMarket, CashBuyerLead } from '../types';
 import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
+import { HCaptchaWidget, HCaptchaWidgetHandle } from './HCaptchaWidget';
 
 interface CashBuyerModalProps {
   isOpen: boolean;
@@ -31,6 +32,10 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [mailtoLink, setMailtoLink] = useState<string>('');
   const [leadRefId, setLeadRefId] = useState<string>('');
+  const [honeypot, setHoneypot] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const captchaRef = useRef<HCaptchaWidgetHandle>(null);
+  const captchaRequired = Boolean(import.meta.env.VITE_HCAPTCHA_SITE_KEY);
 
   const [buyerData, setBuyerData] = useState<CashBuyerLead>({
     fullName: '',
@@ -64,21 +69,25 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
       `Proof of Funds Ready: ${buyerData.proofOfFundsReady ? 'Yes' : 'Pending'}\n` +
       `Target Property: ${targetProperty?.address || 'General List'}`;
 
-    const { ok, refId } = await submitLead(subject, {
-      lead_type: targetProperty ? 'DEAL_CONTRACT_LOCK' : 'VIP_CASH_BUYER',
-      target_property_id: targetProperty?.id,
-      target_property_address: targetProperty?.address,
-      full_name: buyerData.fullName,
-      company_name: buyerData.companyName,
-      phone: buyerData.phone,
-      email: buyerData.email,
-      preferred_metros: buyerData.preferredMetros.join(', '),
-      max_purchase_price: buyerData.maxPurchasePrice,
-      min_discount_pct: buyerData.minDiscountPct,
-      strategies: buyerData.strategies.join(', '),
-      proof_of_funds_ready: buyerData.proofOfFundsReady,
-      message: body,
-    });
+    const { ok, refId } = await submitLead(
+      subject,
+      {
+        lead_type: targetProperty ? 'DEAL_CONTRACT_LOCK' : 'VIP_CASH_BUYER',
+        target_property_id: targetProperty?.id,
+        target_property_address: targetProperty?.address,
+        full_name: buyerData.fullName,
+        company_name: buyerData.companyName,
+        phone: buyerData.phone,
+        email: buyerData.email,
+        preferred_metros: buyerData.preferredMetros.join(', '),
+        max_purchase_price: buyerData.maxPurchasePrice,
+        min_discount_pct: buyerData.minDiscountPct,
+        strategies: buyerData.strategies.join(', '),
+        proof_of_funds_ready: buyerData.proofOfFundsReady,
+        message: body,
+      },
+      { honeypot, captchaToken }
+    );
 
     setLeadRefId(refId);
     setMailtoLink(buildMailtoLink(subject, body));
@@ -95,6 +104,9 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
           colors: ['#10b981', '#f59e0b', '#06b6d4'],
         });
       } catch (e) {}
+    } else {
+      captchaRef.current?.reset();
+      setCaptchaToken('');
     }
   };
 
@@ -225,6 +237,18 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+            {/* Honeypot: hidden from real visitors, bots that auto-fill every field trip it */}
+            <input
+              type="text"
+              name="company_website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] w-px h-px opacity-0"
+            />
+
             {/* Direct Email Routing Notice */}
             <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300">
               When you submit, your criteria is sent directly to <strong className="text-amber-600 dark:text-amber-400">info@crossridgeholdingsllc.com</strong> for review and property matching.
@@ -257,6 +281,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 <input
                   type="text"
                   required
+                  maxLength={100}
                   value={buyerData.fullName}
                   onChange={(e) => setBuyerData({ ...buyerData, fullName: e.target.value })}
                   placeholder="e.g. Alex Rivera"
@@ -269,6 +294,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 </label>
                 <input
                   type="text"
+                  maxLength={100}
                   value={buyerData.companyName}
                   onChange={(e) => setBuyerData({ ...buyerData, companyName: e.target.value })}
                   placeholder="e.g. Apex Equity LLC"
@@ -285,6 +311,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 <input
                   type="tel"
                   required
+                  maxLength={30}
                   value={buyerData.phone}
                   onChange={(e) => setBuyerData({ ...buyerData, phone: e.target.value })}
                   placeholder="(555) 000-0000"
@@ -298,6 +325,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 <input
                   type="email"
                   required
+                  maxLength={150}
                   value={buyerData.email}
                   onChange={(e) => setBuyerData({ ...buyerData, email: e.target.value })}
                   placeholder="investor@domain.com"
@@ -346,10 +374,12 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
               </label>
             </div>
 
+            <HCaptchaWidget ref={captchaRef} onVerify={setCaptchaToken} onExpire={() => setCaptchaToken('')} />
+
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-500/20 transition-all text-xs sm:text-sm"
+              disabled={isSubmitting || (captchaRequired && !captchaToken)}
+              className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-500/20 transition-all text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span>Submitting to info@crossridgeholdingsllc.com...</span>

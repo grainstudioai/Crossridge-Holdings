@@ -9,9 +9,41 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
+const isProduction = process.env.NODE_ENV === "production";
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+// Baseline hardening headers (defense-in-depth if this server is ever
+// deployed live; the production site itself is static and served via
+// GitHub Pages, but these cost nothing to keep on for local/dev use too).
+app.disable("x-powered-by");
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
+
+// A 50mb body limit is far more than any of these endpoints legitimately
+// need and makes it cheap to exhaust memory/disk with junk requests.
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+
+// Minimal in-memory sliding-window rate limiter per client IP. Not a
+// substitute for a real reverse-proxy/WAF rate limit, but stops trivial
+// scripted abuse of endpoints that write files or call a paid AI API.
+function rateLimit(windowMs: number, max: number) {
+  const hits = new Map<string, number[]>();
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const key = req.ip || "unknown";
+    const now = Date.now();
+    const timestamps = (hits.get(key) || []).filter((t) => now - t < windowMs);
+    if (timestamps.length >= max) {
+      return res.status(429).json({ error: "Too many requests. Please try again shortly." });
+    }
+    timestamps.push(now);
+    hits.set(key, timestamps);
+    next();
+  };
+}
 
 // Serve public directory
 const publicDir = path.join(process.cwd(), "public");
@@ -20,17 +52,50 @@ if (!fs.existsSync(publicDir)) {
 }
 app.use(express.static(publicDir));
 
-// Image upload endpoint
-app.post("/api/upload-image", (req, res) => {
+// Image upload endpoint — a content-authoring tool for local development,
+// not a customer-facing feature. It writes directly into the publicly
+// served /public directory with no auth, so it must never be reachable in
+// production: an attacker could otherwise drop arbitrary files (including
+// HTML/SVG capable of running script) into a statically-served path.
+app.post("/api/upload-image", rateLimit(60_000, 10), (req, res) => {
+  if (isProduction) {
+    return res.status(404).json({ error: "Not found" });
+  }
   try {
     const { filename, base64Data } = req.body;
-    if (!filename || !base64Data) {
+    if (!filename || !base64Data || typeof filename !== "string" || typeof base64Data !== "string") {
       return res.status(400).json({ error: "Missing filename or base64Data" });
     }
-    const cleanBase64 = base64Data.replace(/^data:image\/\w+;base64,/, "");
+
+    const mimeMatch = base64Data.match(/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i);
+    if (!mimeMatch) {
+      return res.status(400).json({ error: "Only PNG, JPEG, WEBP, and GIF images are allowed" });
+    }
+
+    const cleanBase64 = base64Data.slice(base64Data.indexOf(",") + 1);
     const buffer = Buffer.from(cleanBase64, "base64");
-    const safeFilename = path.basename(filename);
+
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB
+    if (buffer.length === 0 || buffer.length > MAX_UPLOAD_BYTES) {
+      return res.status(400).json({ error: "Image must be between 1 byte and 8MB" });
+    }
+
+    // path.basename strips any directory components, preventing path
+    // traversal (e.g. "../../server.ts"); we additionally whitelist the
+    // character set and force a known-safe extension from the validated mime type.
+    const ext = mimeMatch[1].toLowerCase().replace("jpeg", "jpg").replace("svg+xml", "svg");
+    const baseName = path
+      .basename(filename)
+      .replace(/\.[^.]+$/, "")
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .slice(0, 80) || "upload";
+    const safeFilename = `${baseName}_${Date.now()}.${ext}`;
     const targetPath = path.join(publicDir, safeFilename);
+
+    if (!targetPath.startsWith(publicDir)) {
+      return res.status(400).json({ error: "Invalid filename" });
+    }
+
     fs.writeFileSync(targetPath, buffer);
     console.log(`Successfully saved uploaded image to ${targetPath} (${buffer.length} bytes)`);
     return res.json({ success: true, filename: safeFilename, url: `/${safeFilename}` });
@@ -63,10 +128,27 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Caps every user-supplied string before it reaches an LLM prompt or an
+// email body: keeps payloads sane and limits prompt-injection surface area
+// (a huge crafted "address" field can't blow past the intended prompt).
+function clampString(value: unknown, maxLen: number): string {
+  if (typeof value !== "string") return "";
+  return value.replace(/[\r\n]+/g, " ").trim().slice(0, maxLen);
+}
+
 // Automated Property Valuation & AI Wholesale Underwriting Endpoint
-app.post("/api/ai-valuation", async (req, res) => {
+app.post("/api/ai-valuation", rateLimit(60_000, 20), async (req, res) => {
   try {
-    const { address, city, state, zip, bedrooms, bathrooms, sqft, propertyType, condition, reasonForSelling } = req.body;
+    const address = clampString(req.body.address, 150);
+    const city = clampString(req.body.city, 80);
+    const state = clampString(req.body.state, 20);
+    const zip = clampString(req.body.zip, 15);
+    const bedrooms = clampString(req.body.bedrooms, 10);
+    const bathrooms = clampString(req.body.bathrooms, 10);
+    const sqft = req.body.sqft;
+    const propertyType = clampString(req.body.propertyType, 60);
+    const condition = clampString(req.body.condition, 40);
+    const reasonForSelling = clampString(req.body.reasonForSelling, 300);
 
     if (!address || !city || !state) {
       return res.status(400).json({ error: "Address, city, and state are required." });
@@ -170,133 +252,6 @@ Keep it punchy, quantitative, and directly actionable.`;
     console.error("Valuation endpoint error:", error);
     return res.status(500).json({ error: "Failed to calculate valuation", details: error?.message });
   }
-});
-
-// In-memory notification dispatch log for info@crossridgeholdingsllc.com
-interface EmailDispatch {
-  id: string;
-  recipient: string;
-  subject: string;
-  body: string;
-  leadType: string;
-  timestamp: string;
-  data: Record<string, any>;
-}
-
-const emailDispatches: EmailDispatch[] = [];
-
-// Lead capture & notification endpoint (Dispatched to info@crossridgeholdingsllc.com)
-app.post("/api/leads", (req, res) => {
-  const payload = req.body;
-  const leadType = payload.leadType || "SELLER_PROPERTY_SUBMISSION";
-  const refId = "CRH-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const timestamp = new Date().toISOString();
-  const recipient = "info@crossridgeholdingsllc.com";
-
-  let subject = "";
-  let bodyLines: string[] = [];
-
-  if (leadType === "MOTIVATED_SELLER" || leadType === "SELLER_PROPERTY_SUBMISSION") {
-    const address = payload.address || "Unspecified Street";
-    const city = payload.city || "Columbus";
-    const state = payload.state || "OH";
-    const zip = payload.zip || "";
-
-    subject = `[New Seller Property Review] ${address}, ${city}, ${state}`;
-
-    bodyLines = [
-      `CROSSRIDGE HOLDINGS LLC - NEW PROPERTY SUBMISSION FOR REVIEW`,
-      `============================================================`,
-      `Reference ID: ${refId}`,
-      `Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })} EST`,
-      `Recipient: ${recipient}`,
-      ``,
-      `PROPERTY DETAILS:`,
-      `- Address: ${address}`,
-      `- City, State Zip: ${city}, ${state} ${zip}`,
-      `- Beds / Baths: ${payload.bedrooms || "N/A"} Beds / ${payload.bathrooms || "N/A"} Baths`,
-      `- Estimated SqFt: ${payload.sqft ? `${payload.sqft} sqft` : "N/A"}`,
-      `- Property Type: ${payload.propertyType || "Single Family"}`,
-      `- Condition: ${payload.condition || "Not specified"}`,
-      `- Preferred Timeline: ${payload.timeline || "Not specified"}`,
-      `- Mortgages / Liens / Notes: ${payload.notes || "None noted"}`,
-      ``,
-      `SELLER CONTACT INFORMATION:`,
-      `- Name: ${payload.fullName || payload.name || "Not provided"}`,
-      `- Phone: ${payload.phone || "Not provided"}`,
-      `- Email: ${payload.email || "Not provided"}`,
-      ``,
-      `ACTION REQUIRED:`,
-      `Review recent comparable neighborhood sales and property condition to determine investor network criteria fit.`,
-      `============================================================`,
-    ];
-  } else {
-    // Investor / Cash Buyer
-    const fullName = payload.fullName || payload.name || "Ohio Cash Buyer";
-    const company = payload.companyName ? ` (${payload.companyName})` : "";
-
-    subject = `[New VIP Cash Buyer Inquiry] ${fullName}${company}`;
-
-    bodyLines = [
-      `CROSSRIDGE HOLDINGS LLC - NEW CASH BUYER / INVESTOR INQUIRY`,
-      `===========================================================`,
-      `Reference ID: ${refId}`,
-      `Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })} EST`,
-      `Recipient: ${recipient}`,
-      ``,
-      `BUYER PROFILE:`,
-      `- Full Name: ${fullName}`,
-      `- Company: ${payload.companyName || "Individual Investor"}`,
-      `- Phone: ${payload.phone || "Not provided"}`,
-      `- Email: ${payload.email || "Not provided"}`,
-      ``,
-      `BUYING CRITERIA:`,
-      `- Preferred Ohio Metros: ${Array.isArray(payload.preferredMetros) ? payload.preferredMetros.join(", ") : payload.preferredMetros || "Statewide Ohio"}`,
-      `- Max Purchase Price: $${Number(payload.maxPurchasePrice || 0).toLocaleString()}`,
-      `- Min Discount Below ARV: ${payload.minDiscountPct || 30}%`,
-      `- Strategies: ${Array.isArray(payload.strategies) ? payload.strategies.join(", ") : payload.strategies || "Fix & Flip"}`,
-      `- Proof of Funds Ready: ${payload.proofOfFundsReady ? "YES (Verified liquid funds)" : "Pending"}`,
-      ``,
-      `ACTION REQUIRED:`,
-      `Review active wholesale inventory in requested metros and add to exclusive VIP off-market contract broadcast.`,
-      `===========================================================`,
-    ];
-  }
-
-  const emailBody = bodyLines.join("\n");
-
-  const dispatchRecord: EmailDispatch = {
-    id: refId,
-    recipient,
-    subject,
-    body: emailBody,
-    leadType,
-    timestamp,
-    data: payload,
-  };
-
-  emailDispatches.unshift(dispatchRecord);
-  if (emailDispatches.length > 100) emailDispatches.pop();
-
-  // Distinct console logging for email delivery verification
-  console.log(`\n======================================================`);
-  console.log(`[EMAIL DISPATCHED TO ${recipient}]`);
-  console.log(`SUBJECT: ${subject}`);
-  console.log(emailBody);
-  console.log(`======================================================\n`);
-
-  const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-
-  return res.json({
-    success: true,
-    leadId: refId,
-    recipient,
-    subject,
-    emailBody,
-    mailtoUrl,
-    receivedAt: timestamp,
-    message: `Property details successfully received and dispatched to ${recipient}. Our team is reviewing the property and recent comparable sales.`,
-  });
 });
 
 // Production / Dev Vite integration

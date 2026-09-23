@@ -32,6 +32,7 @@ jobs:
       - name: Build static site
         env:
           VITE_WEB3FORMS_ACCESS_KEY: ${{ secrets.WEB3FORMS_ACCESS_KEY }}
+          VITE_HCAPTCHA_SITE_KEY: ${{ secrets.HCAPTCHA_SITE_KEY }}
         run: ./node_modules/.bin/vite build
 
       - name: Keep custom domain
