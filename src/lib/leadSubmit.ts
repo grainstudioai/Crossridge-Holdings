@@ -5,9 +5,12 @@
 //
 // Setup: create a free form at https://web3forms.com pointed at
 // info@crossridgeholdingsllc.com, then set VITE_WEB3FORMS_ACCESS_KEY (see .env.example).
-// For spam protection, also enable hCaptcha on that Web3Forms form (its secret key is
-// configured in the Web3Forms dashboard, never in this codebase) and set
-// VITE_HCAPTCHA_SITE_KEY to the matching public site key.
+// For spam protection, hCaptcha is enabled directly on the Web3Forms dashboard
+// (Security Settings > Captcha Protection). Web3Forms' free plan uses a shared,
+// zero-config hCaptcha site key (see HCaptchaWidget.tsx) — no separate hCaptcha
+// account or secret key is needed.
+
+import { getHCaptchaSiteKey } from '../components/HCaptchaWidget';
 
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 const RECIPIENT_EMAIL = 'info@crossridgeholdingsllc.com';
@@ -81,8 +84,7 @@ export async function submitLead(
     return { ok: false, refId, reason: 'not_configured' };
   }
 
-  const captchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined;
-  if (captchaSiteKey && !options.captchaToken) {
+  if (getHCaptchaSiteKey() && !options.captchaToken) {
     return { ok: false, refId, reason: 'captcha_required' };
   }
 

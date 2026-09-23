@@ -19,15 +19,27 @@ interface HCaptchaWidgetProps {
   onExpire?: () => void;
 }
 
-// Renders an hCaptcha challenge tied to VITE_HCAPTCHA_SITE_KEY. Its matching
-// secret key lives only in the Web3Forms dashboard (never in this codebase),
-// which validates the token server-side before relaying the email — this is
-// what actually stops scripted spam submissions, not anything client-side.
+// Web3Forms' own shared, zero-config hCaptcha site key for free-plan accounts
+// (documented at https://docs.web3forms.com/... "hCaptcha" page). It is not a
+// secret — it's meant to be used client-side by any Web3Forms free-plan
+// site — so no signup or per-site key is required. VITE_HCAPTCHA_SITE_KEY can
+// override it if this project ever moves to a paid Web3Forms plan with a
+// dedicated hCaptcha site.
+const WEB3FORMS_SHARED_SITE_KEY = '50b2fe65-b00b-4b9e-ad62-3ba471098be2';
+
+export function getHCaptchaSiteKey(): string {
+  return (import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined) || WEB3FORMS_SHARED_SITE_KEY;
+}
+
+// Renders an hCaptcha challenge. Web3Forms validates the resulting token
+// server-side (hCaptcha is enabled on the Web3Forms dashboard's Security
+// Settings) before relaying the email — that server-side check is what
+// actually stops scripted spam submissions, not anything client-side.
 export const HCaptchaWidget = forwardRef<HCaptchaWidgetHandle, HCaptchaWidgetProps>(
   ({ onVerify, onExpire }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
-    const siteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined;
+    const siteKey = getHCaptchaSiteKey();
 
     useEffect(() => {
       if (!siteKey || !containerRef.current) return;

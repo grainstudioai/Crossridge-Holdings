@@ -18,7 +18,7 @@ import {
 import confetti from 'canvas-confetti';
 import { SellerLead } from '../types';
 import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
-import { HCaptchaWidget, HCaptchaWidgetHandle } from './HCaptchaWidget';
+import { HCaptchaWidget, HCaptchaWidgetHandle, getHCaptchaSiteKey } from './HCaptchaWidget';
 
 interface SellerLeadModalProps {
   isOpen: boolean;
@@ -40,7 +40,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
   const [honeypot, setHoneypot] = useState<string>('');
   const [captchaToken, setCaptchaToken] = useState<string>('');
   const captchaRef = useRef<HCaptchaWidgetHandle>(null);
-  const captchaRequired = Boolean(import.meta.env.VITE_HCAPTCHA_SITE_KEY);
+  const captchaRequired = Boolean(getHCaptchaSiteKey());
 
   const [formData, setFormData] = useState<SellerLead>({
     address: initialData?.address || '',

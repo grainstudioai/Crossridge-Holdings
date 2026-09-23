@@ -12,7 +12,7 @@ import {
 import confetti from 'canvas-confetti';
 import { WholesaleProperty, MetroMarket, CashBuyerLead } from '../types';
 import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
-import { HCaptchaWidget, HCaptchaWidgetHandle } from './HCaptchaWidget';
+import { HCaptchaWidget, HCaptchaWidgetHandle, getHCaptchaSiteKey } from './HCaptchaWidget';
 
 interface CashBuyerModalProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
   const [honeypot, setHoneypot] = useState<string>('');
   const [captchaToken, setCaptchaToken] = useState<string>('');
   const captchaRef = useRef<HCaptchaWidgetHandle>(null);
-  const captchaRequired = Boolean(import.meta.env.VITE_HCAPTCHA_SITE_KEY);
+  const captchaRequired = Boolean(getHCaptchaSiteKey());
 
   const [buyerData, setBuyerData] = useState<CashBuyerLead>({
     fullName: '',
