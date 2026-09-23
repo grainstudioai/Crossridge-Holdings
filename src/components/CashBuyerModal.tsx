@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { WholesaleProperty, MetroMarket, CashBuyerLead } from '../types';
+import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
 
 interface CashBuyerModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
   metros,
 }) => {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [mailtoLink, setMailtoLink] = useState<string>('');
   const [leadRefId, setLeadRefId] = useState<string>('');
@@ -47,50 +49,44 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(false);
 
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leadType: targetProperty ? 'DEAL_CONTRACT_LOCK' : 'VIP_CASH_BUYER',
-          targetPropertyId: targetProperty?.id,
-          targetPropertyAddress: targetProperty?.address,
-          ...buyerData,
-        }),
-      });
+    const subject = `[New VIP Cash Buyer Inquiry] ${buyerData.fullName}${buyerData.companyName ? ` (${buyerData.companyName})` : ''}`;
+    const body =
+      `Investor: ${buyerData.fullName}\n` +
+      `Company: ${buyerData.companyName || 'N/A'}\n` +
+      `Phone: ${buyerData.phone}\n` +
+      `Email: ${buyerData.email}\n` +
+      `Preferred Metros: ${buyerData.preferredMetros.join(', ')}\n` +
+      `Max Purchase Price: $${buyerData.maxPurchasePrice}\n` +
+      `Min Discount Below ARV: ${buyerData.minDiscountPct}%\n` +
+      `Strategies: ${buyerData.strategies.join(', ')}\n` +
+      `Proof of Funds Ready: ${buyerData.proofOfFundsReady ? 'Yes' : 'Pending'}\n` +
+      `Target Property: ${targetProperty?.address || 'General List'}`;
 
-      const data = await res.json();
-      const ref = data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-      setLeadRefId(ref);
+    const { ok, refId } = await submitLead(subject, {
+      lead_type: targetProperty ? 'DEAL_CONTRACT_LOCK' : 'VIP_CASH_BUYER',
+      target_property_id: targetProperty?.id,
+      target_property_address: targetProperty?.address,
+      full_name: buyerData.fullName,
+      company_name: buyerData.companyName,
+      phone: buyerData.phone,
+      email: buyerData.email,
+      preferred_metros: buyerData.preferredMetros.join(', '),
+      max_purchase_price: buyerData.maxPurchasePrice,
+      min_discount_pct: buyerData.minDiscountPct,
+      strategies: buyerData.strategies.join(', '),
+      proof_of_funds_ready: buyerData.proofOfFundsReady,
+      message: body,
+    });
 
-      if (data.mailtoUrl) {
-        setMailtoLink(data.mailtoUrl);
-      } else {
-        const subject = encodeURIComponent(`[Cash Buyer Inquiry] ${buyerData.fullName} ${buyerData.companyName ? `(${buyerData.companyName})` : ''}`);
-        const body = encodeURIComponent(
-          `Investor: ${buyerData.fullName}\n` +
-          `Company: ${buyerData.companyName || 'N/A'}\n` +
-          `Phone: ${buyerData.phone}\n` +
-          `Email: ${buyerData.email}\n` +
-          `Preferred Metros: ${buyerData.preferredMetros.join(', ')}\n` +
-          `Max Purchase Price: $${buyerData.maxPurchasePrice}\n` +
-          `Target Property: ${targetProperty?.address || 'General List'}`
-        );
-        setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
-      }
-    } catch (err) {
-      const fallbackRef = 'CRH-' + Math.floor(100000 + Math.random() * 900000);
-      setLeadRefId(fallbackRef);
-      const subject = encodeURIComponent(`[Cash Buyer Inquiry] ${buyerData.fullName}`);
-      const body = encodeURIComponent(
-        `Investor: ${buyerData.fullName} (${buyerData.phone} / ${buyerData.email})\n` +
-        `Metros: ${buyerData.preferredMetros.join(', ')}`
-      );
-      setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
-    } finally {
-      setIsSubmitting(false);
-      setIsSuccess(true);
+    setLeadRefId(refId);
+    setMailtoLink(buildMailtoLink(subject, body));
+    setIsSubmitting(false);
+    setIsSuccess(ok);
+    setSubmitError(!ok);
+
+    if (ok) {
       try {
         confetti({
           particleCount: 70,
@@ -195,6 +191,35 @@ export const CashBuyerModal: React.FC<CashBuyerModalProps> = ({
                 className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
               >
                 Close & View Inventory
+              </button>
+            </div>
+          </div>
+        ) : submitError ? (
+          /* Error Screen — the automatic email failed, ask the visitor to send it directly */
+          <div className="p-6 sm:p-8 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+              <X className="w-8 h-8" />
+            </div>
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1 mb-2">
+              We Couldn't Send That Automatically
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-sm mx-auto mb-6">
+              Please tap the button below to send your buying criteria to our team directly from your email app.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <a
+                href={mailtoLink}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>Send Email to Our Team</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setSubmitError(false)}
+                className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-colors"
+              >
+                Try Again
               </button>
             </div>
           </div>

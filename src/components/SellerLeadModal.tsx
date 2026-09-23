@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SellerLead } from '../types';
+import { submitLead, buildMailtoLink } from '../lib/leadSubmit';
 
 interface SellerLeadModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
   const [step, setStep] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<boolean>(false);
   const [leadRefId, setLeadRefId] = useState<string>('');
   const [mailtoLink, setMailtoLink] = useState<string>('');
 
@@ -79,52 +81,47 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leadType: 'SELLER_PROPERTY_SUBMISSION',
-          ...formData,
-        }),
-      });
+    setSubmitError(false);
 
-      const data = await res.json();
-      const ref = data.leadId || 'CRH-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-      setLeadRefId(ref);
+    const subject = `[New Seller Property Review] ${formData.address}, ${formData.city}, ${formData.state}`;
+    const body =
+      `Property Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}\n` +
+      `Beds/Baths: ${formData.bedrooms}/${formData.bathrooms}\n` +
+      `SqFt: ${formData.sqft}\n` +
+      `Property Type: ${formData.propertyType}\n` +
+      `Condition: ${formData.condition}\n` +
+      `Timeline: ${formData.timeline}\n` +
+      `Notes: ${formData.notes || 'None'}\n\n` +
+      `Seller Contact:\n` +
+      `Name: ${formData.fullName}\n` +
+      `Phone: ${formData.phone}\n` +
+      `Email: ${formData.email}`;
 
-      if (data.mailtoUrl) {
-        setMailtoLink(data.mailtoUrl);
-      } else {
-        const subject = encodeURIComponent(`[Property Review] ${formData.address}, ${formData.city}, ${formData.state}`);
-        const body = encodeURIComponent(
-          `Property Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}\n` +
-          `Beds/Baths: ${formData.bedrooms}/${formData.bathrooms}\n` +
-          `SqFt: ${formData.sqft}\n` +
-          `Condition: ${formData.condition}\n` +
-          `Timeline: ${formData.timeline}\n` +
-          `Notes: ${formData.notes || 'None'}\n\n` +
-          `Seller Contact:\n` +
-          `Name: ${formData.fullName}\n` +
-          `Phone: ${formData.phone}\n` +
-          `Email: ${formData.email}`
-        );
-        setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
-      }
-    } catch (err) {
-      const fallbackRef = 'CRH-' + Math.floor(100000 + Math.random() * 900000);
-      setLeadRefId(fallbackRef);
-      const subject = encodeURIComponent(`[Property Review] ${formData.address}, ${formData.city}, ${formData.state}`);
-      const body = encodeURIComponent(
-        `Property Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}\n` +
-        `Seller: ${formData.fullName} (${formData.phone} / ${formData.email})`
-      );
-      setMailtoLink(`mailto:info@crossridgeholdingsllc.com?subject=${subject}&body=${body}`);
-    } finally {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      triggerCelebration();
-    }
+    const { ok, refId } = await submitLead(subject, {
+      lead_type: 'SELLER_PROPERTY_SUBMISSION',
+      full_name: formData.fullName,
+      phone: formData.phone,
+      email: formData.email,
+      property_address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      zip: formData.zip,
+      bedrooms: formData.bedrooms,
+      bathrooms: formData.bathrooms,
+      sqft: formData.sqft,
+      property_type: formData.propertyType,
+      condition: formData.condition,
+      timeline: formData.timeline,
+      notes: formData.notes,
+      message: body,
+    });
+
+    setLeadRefId(refId);
+    setMailtoLink(buildMailtoLink(subject, body));
+    setIsSubmitting(false);
+    setIsSuccess(ok);
+    setSubmitError(!ok);
+    if (ok) triggerCelebration();
   };
 
   return (
@@ -141,7 +138,7 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
               <span>Crossridge Holdings Property Review</span>
             </div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-              {isSuccess ? 'Property Details Received' : 'Submit Your Property for Review'}
+              {isSuccess ? 'Property Details Received' : submitError ? 'Submission Issue' : 'Submit Your Property for Review'}
             </h3>
           </div>
           <button
@@ -215,6 +212,35 @@ export const SellerLeadModal: React.FC<SellerLeadModalProps> = ({
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
               >
                 Close & Return
+              </button>
+            </div>
+          </div>
+        ) : submitError ? (
+          /* Error Screen — the automatic email failed, ask the visitor to send it directly */
+          <div className="p-6 sm:p-8 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+              <X className="w-8 h-8" />
+            </div>
+            <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 mb-2">
+              We Couldn't Send That Automatically
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
+              Please tap the button below to send your property details to our team directly from your email app.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href={mailtoLink}
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition-all"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Send Email to Our Team</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setSubmitError(false)}
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+              >
+                Try Again
               </button>
             </div>
           </div>
