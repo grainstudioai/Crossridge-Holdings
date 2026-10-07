@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Phone, Mail, MapPin, ShieldCheck, Heart } from 'lucide-react';
+import { Phone, Mail, MapPin, ShieldCheck, Heart } from 'lucide-react';
 import { WHOLESALE_LEGAL_COMPLIANCE } from '../data/wholesaleData';
 
 export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ onNavigate }) => {
@@ -10,10 +10,12 @@ export const Footer: React.FC<{ onNavigate: (section: string) => void }> = ({ on
           {/* Brand & Mission */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-black">
-                <Building2 className="w-4 h-4" />
-              </div>
-              <span className="text-base font-black text-white tracking-tight">
+              <img
+                src="/images/logo.png"
+                alt="Crossridge Holdings logo"
+                className="h-7 w-auto object-contain"
+              />
+              <span className="font-brand text-base text-white tracking-tight">
                 CROSSRIDGE HOLDINGS <span className="text-amber-500 text-xs">LLC</span>
               </span>
             </div>

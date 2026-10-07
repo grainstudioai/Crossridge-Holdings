@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Building2, Moon, Sun, ShieldCheck } from 'lucide-react';
+import { Phone, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { MetroMarket } from '../types';
 
 interface NavbarProps {
@@ -31,11 +31,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onNavigate('hero')}
             className="flex items-center gap-2.5 text-left group focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-400 flex items-center justify-center text-white shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
-              <Building2 className="w-5 h-5" />
-            </div>
+            <img
+              src="/images/logo.png"
+              alt="Crossridge Holdings logo"
+              className="h-9 w-auto object-contain group-hover:scale-105 transition-transform"
+            />
             <div>
-              <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
+              <span className="font-brand text-lg tracking-tight text-slate-900 dark:text-white">
                 CROSSRIDGE HOLDINGS
               </span>
             </div>
